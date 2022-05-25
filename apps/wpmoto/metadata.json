@@ -2,7 +2,7 @@
   "id": "wpmoto",
   "name": "Waypointer Moto",
   "shortName": "Waypointer Moto",
-  "version": "1.06",
+  "version": "1.07",
   "description": "Waypoint-based motorcycle navigation aid",
   "icon": "wpmoto.png",
   "tags": "tool,outdoors,gps",
