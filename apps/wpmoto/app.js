@@ -7,7 +7,7 @@ var wp_bearing = 0;
 var routeidx = 0;
 var candraw = true;
 
-const ROUTE_STEP = 50; // metres
+//const ROUTE_STEP = 50; // metres
 const EPSILON = 1; // degrees
 
 var direction = 0;
@@ -219,7 +219,7 @@ function onGPS(fix) {
       while (true) {
         dist = distance(fix, wp.route[routeidx]);
         // step to next point if we're within ROUTE_STEP metres
-        if (!isNaN(dist) && dist < ROUTE_STEP && routeidx < wp.route.length-1)
+        if (!isNaN(dist) && dist < parseInt(cfg.routeStep) && routeidx < wp.route.length-1)
           routeidx++;
         else
           break;
@@ -273,8 +273,32 @@ function wptMenu() {
       routeidx = 0;
 }
 
-function wptDel() {
+function optMenu() {
   setButtons(false);
+  candraw = false;
+  
+  var menu = {
+    "": { "title": "-- Options --" },
+  };
+
+  menu["< Back"] = mainScreen;
+
+  menu["Delete " + wp.name] = function() {
+    wptDel();
+  };
+  
+  menu["Route Step"] = {
+    value : cfg.routeStep,
+    min:50,max:300,step:50,
+    onchange : v => { cfg.routStep=v; savSettings(); }
+  };
+  
+  E.showMenu(menu);
+}
+
+
+function wptDel() {
+//  setButtons(false);
  
     candraw = false;
     var thing = wp.route ? "route" : "waypoint";
@@ -285,7 +309,8 @@ function wptDel() {
         deleteWaypoint(wp);
         E.showAlert(thing + " deleted: " + name).then(mainScreen);
       } else {
-        mainScreen();
+       // mainScreen();
+        optMenu();
       }
     });  
 
@@ -354,7 +379,7 @@ function setButtons(on){
   
     // BTN3 - delete wp
     setWatch(function(e){
-      wptDel();
+      optMenu();
     }, BTN3, {repeat:false,edge:"rising"});
     }
     else {
@@ -375,8 +400,15 @@ function mainScreen() {
   Bangle.drawWidgets();
 }
 
-//----
+function savSettings() {
+  require("Storage").write('wpmoto.json',cfg);
+}
 
+// Read settings. 
+let cfg = require('Storage').readJSON('wpmoto.json',1)||{};
+cfg.routeStep = cfg.routeStep==undefined?'50':cfg.routeStep; 
+
+//----
 
 Bangle.on('kill',()=>{
   Bangle.setCompassPower(0);
