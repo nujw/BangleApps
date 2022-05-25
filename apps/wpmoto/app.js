@@ -253,16 +253,11 @@ function addWaypointToMenu(menu, i) {
   };
 }
 
-function mainScreen() {
-  E.showMenu();
-  candraw = true;
-  g.setColor(0,0,0);
-  g.fillRect(0,0,W,H);
-  draw(true);
+//----
 
-  Bangle.setUI("updown", function(v) {
-    if (v === undefined) {
-      candraw = false;
+function wptMenu() {
+  setButtons(false);
+     candraw = false;
       var menu = {
         "": { "title": "-- Waypoints --" },
       };
@@ -275,23 +270,102 @@ function mainScreen() {
       };
       menu["< Back"] = mainScreen;
       E.showMenu(menu);
-    } else {
-      candraw = false;
-      var thing = wp.route ? "route" : "waypoint";
-      E.showPrompt("Delete " + thing + ": " + wp.name + "?").then(function(confirmed) {
-        var name = wp.name;
-        if (confirmed) {
-          var thing = wp.route ? "Route" : "Waypoint";
-          deleteWaypoint(wp);
-          E.showAlert(thing + " deleted: " + name).then(mainScreen);
-        } else {
-          mainScreen();
-        }
-      });
-    }
-  });
+      routeidx = 0;
 }
 
+function wptDel() {
+  setButtons(false);
+ 
+    candraw = false;
+    var thing = wp.route ? "route" : "waypoint";
+    E.showPrompt("Delete " + thing + ": " + wp.name + "?").then(function(confirmed) {
+      var name = wp.name;
+      if (confirmed) {
+        var thing = wp.route ? "Route" : "Waypoint";
+        deleteWaypoint(wp);
+        E.showAlert(thing + " deleted: " + name).then(mainScreen);
+      } else {
+        mainScreen();
+      }
+    });  
+
+}
+
+function wptSkip(dur) {
+  var r2=wp.route;
+  var i;
+  
+  if (wp.route) {
+    if ( dur > 2 ) {    // Long button press to reverse route.
+      wp.route = [];
+      for (i = 0; i < r2.length; i++) {
+        wp.route[i] = r2[r2.length-i-1];
+      }      
+      
+      routeidx = 0;    // start of route
+      mainScreen();
+      return;
+    }
+    else {              // Next wp in route.
+      routeidx++;
+      if ( routeidx >= wp.route.length ) routeidx = 0;
+    }
+  }
+  else {
+    if ( dur > 2 ) {
+      // ignore
+    }
+    else {
+      for (i = 0; i < waypoints.length; i++) {
+        if (waypoints[i] == wp) {
+          i++;
+          break;
+        }
+      }
+      if ( i >= waypoints.length ) i=0;
+      wp = waypoints[i];
+      mainScreen();
+    }
+  }
+}
+
+
+function setButtons(on){
+  if ( on ) {
+    // BTN1 - short = next WP, long = reverse route
+    setWatch(function(e) {
+      var dur = e.time - e.lastTime;
+      wptSkip(dur);
+    }, BTN1, { edge:"falling",repeat:true});
+  
+    // BTN2 - waypoint menu
+    setWatch(function(e){
+      wptMenu();
+    }, BTN2, {repeat:false,edge:"rising"});
+  
+    // BTN3 - delete wp
+    setWatch(function(e){
+      wptDel();
+    }, BTN3, {repeat:false,edge:"rising"});
+    }
+    else {
+      clearWatch();
+  }
+}
+
+
+function mainScreen() {
+  E.showMenu();          // menus off
+  setButtons(false);    // restore button functions
+  setButtons(true);
+
+  candraw = true;
+  g.setColor(0,0,0);
+  g.fillRect(0,0,W,H);
+  draw(true);
+}
+
+//----
 Bangle.on('kill',()=>{
   Bangle.setCompassPower(0);
   Bangle.setGPSPower(0);
