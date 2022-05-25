@@ -298,8 +298,8 @@ function wptSkip(dur) {
   
   if (wp.route) {
     if ( dur > 2 ) {    // Long button press to reverse route.
-      wp.route = [];
       list=wp.route;
+      wp.route = [];
       for (i = 0; i < list.length; i++) {
         wp.route[i] = list[list.length-i-1];
       }      
