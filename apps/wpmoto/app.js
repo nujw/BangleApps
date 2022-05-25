@@ -1,8 +1,14 @@
 var loc = require("locale");
 
+// Read settings. 
+let cfg = require('Storage').readJSON('wpmoto.json', 1) || {};
+cfg.routeStep = cfg.routeStep == undefined ? '50' : cfg.routeStep;
+
 var waypoints = require("Storage").readJSON("waypoints.json") || [];
 var wp = waypoints[0];
-if (wp == undefined) wp = {name:"NONE"};
+if (wp == undefined) wp = {
+  name: "NONE"
+};
 var wp_bearing = 0;
 var routeidx = 0;
 var candraw = true;
@@ -65,15 +71,23 @@ if (W == 176) {
   };
 }
 
-var pal_by = new Uint16Array([0x0000,0xffc0],0,1); // black, yellow
-var pal_bw = new Uint16Array([0x0000,0xffff],0,1); // black, white
-var pal_br = new Uint16Array([0x0000,0xf800],0,1); // black, red
+var pal_by = new Uint16Array([0x0000, 0xffc0], 0, 1); // black, yellow
+var pal_bw = new Uint16Array([0x0000, 0xffff], 0, 1); // black, white
+var pal_br = new Uint16Array([0x0000, 0xf800], 0, 1); // black, red
 
-var buf = Graphics.createArrayBuffer(240,160, 1, {msb:true});
+var buf = Graphics.createArrayBuffer(240, 160, 1, {
+  msb: true
+});
 var arrow_img = require("heatshrink").decompress(atob("vF4wJC/AEMYBxs8Bxt+Bxv/BpkB/+ABxcD//ABxcH//gBxcP//wBxcf//4Bxc///8Bxd///+OxgABOxgABPBR2BAAJ4KOwIABPBR2BAAJ4KOwIABPBR2BAAJ4KOwIABPBQNCPBR2DPBR2DPBR2DPBR2DPBR2DPBR2DPBR2DPBQNEPBB2FPBB2FPBB2FPBB2FPBB2FPBB2FPBB2FPBANGPAx2HPAx2HPAx2HPAx2HPAx2HPAx2HeJTeJB34O/B34O/B34O/B34O/B34O/B34O/B34O/B34OTAH4AT"));
 
-function flip(y,h,palette) {
-  g.drawImage({width:240,height:h,bpp:1,buffer:buf.buffer, palette:palette},0,y);
+function flip(y, h, palette) {
+  g.drawImage({
+    width: 240,
+    height: h,
+    bpp: 1,
+    buffer: buf.buffer,
+    palette: palette
+  }, 0, y);
   buf.clear();
 }
 
@@ -83,7 +97,7 @@ function draw(force) {
   var course = direction;
   var dst = loc.distance(dist);
 
-  if (force || previous.dst !== dst || previous.wp_name !== wp.name || previous.routeidx !== routeidx || Math.abs(course-previous.course)>EPSILON) {
+  if (force || previous.dst !== dst || previous.wp_name !== wp.name || previous.routeidx !== routeidx || Math.abs(course - previous.course) > EPSILON) {
     previous.course = course;
 
     var palette = pal_br;
@@ -91,12 +105,14 @@ function draw(force) {
       palette = isNaN(savedfix.course) ? pal_by : pal_bw;
 
     buf.setColor(1);
-    buf.fillCircle(L.arrow.x,L.arrow.y, L.arrow.r1);
+    buf.fillCircle(L.arrow.x, L.arrow.y, L.arrow.r1);
     buf.setColor(0);
-    buf.fillCircle(L.arrow.x,L.arrow.y, L.arrow.r2);
+    buf.fillCircle(L.arrow.x, L.arrow.y, L.arrow.r2);
     buf.setColor(1);
-    buf.drawImage(arrow_img, L.arrow.x, L.arrow.y, {rotate:radians(course)} );
-    flip(L.arrow.bufy,L.arrow.bufh,palette);
+    buf.drawImage(arrow_img, L.arrow.x, L.arrow.y, {
+      rotate: radians(course)
+    });
+    flip(L.arrow.bufy, L.arrow.bufh, palette);
 
     // distance on left
     previous.dst = dst;
@@ -105,8 +121,8 @@ function draw(force) {
 
     buf.setColor(1);
     buf.setFontAlign(-1, -1);
-    buf.setFont("Vector",L.text.largesize);
-    buf.drawString(dst,0,0);
+    buf.setFont("Vector", L.text.largesize);
+    buf.drawString(dst, 0, 0);
 
     // waypoint name on right
     buf.setColor(1);
@@ -116,16 +132,17 @@ function draw(force) {
 
     // if this is a route, draw the step name above the route name
     if (wp.route) {
-      buf.drawString((wp.route[routeidx].name||'') + " " + (routeidx+1) + "/" + wp.route.length, W, 0);
+      buf.drawString((wp.route[routeidx].name || '') + " " + (routeidx + 1) + "/" + wp.route.length, W, 0);
     }
 
-    flip(L.text.bufy,L.text.bufh,pal_bw);
+    flip(L.text.bufy, L.text.bufh, pal_bw);
   }
 }
 
 /*** Heading ***/
 
 var heading = 0;
+
 function read_heading() {
   if (savedfix !== undefined && savedfix.satellites > 0 && !isNaN(savedfix.course)) {
     Bangle.setCompassPower(0);
@@ -147,27 +164,27 @@ function read_heading() {
 /*** Maths ***/
 
 function radians(a) {
-  return a*Math.PI/180;
+  return a * Math.PI / 180;
 }
 
 function degrees(a) {
-  var d = a*180/Math.PI;
-  return (d+360)%360;
+  var d = a * 180 / Math.PI;
+  return (d + 360) % 360;
 }
 
-function bearing(a,b){
-  var delta = radians(b.lon-a.lon);
+function bearing(a, b) {
+  var delta = radians(b.lon - a.lon);
   var alat = radians(a.lat);
   var blat = radians(b.lat);
   var y = Math.sin(delta) * Math.cos(blat);
-  var x = Math.cos(alat)*Math.sin(blat) -         Math.sin(alat)*Math.cos(blat)*Math.cos(delta);
+  var x = Math.cos(alat) * Math.sin(blat) - Math.sin(alat) * Math.cos(blat) * Math.cos(delta);
   return Math.round(degrees(Math.atan2(y, x)));
 }
 
-function distance(a,b){
-  var x = radians(a.lon-b.lon) * Math.cos(radians((a.lat+b.lat)/2));
-  var y = radians(b.lat-a.lat);
-  return Math.round(Math.sqrt(x*x + y*y) * 6371000);
+function distance(a, b) {
+  var x = radians(a.lon - b.lon) * Math.cos(radians((a.lat + b.lat) / 2));
+  var y = radians(b.lat - a.lat);
+  return Math.round(Math.sqrt(x * x + y * y) * 6371000);
 }
 
 /*** Waypoints ***/
@@ -179,7 +196,7 @@ function addCurrentWaypoint() {
   while (!ok) {
     ok = true;
     for (var i = 0; i < waypoints.length && ok; i++) {
-      if (waypoints[i].name == ("WP"+wpnum)) {
+      if (waypoints[i].name == ("WP" + wpnum)) {
         wpnum++;
         ok = false;
       }
@@ -191,7 +208,7 @@ function addCurrentWaypoint() {
     lat: savedfix.lat,
     lon: savedfix.lon,
   });
-  wp = waypoints[waypoints.length-1];
+  wp = waypoints[waypoints.length - 1];
   saveWaypoints();
 }
 
@@ -204,7 +221,9 @@ function deleteWaypoint(w) {
     if (waypoints[i] == w) {
       waypoints.splice(i, 1);
       saveWaypoints();
-      wp = {name:"NONE"};
+      wp = {
+        name: "NONE"
+      };
     }
   }
 }
@@ -214,12 +233,12 @@ function deleteWaypoint(w) {
 function onGPS(fix) {
   savedfix = fix;
 
-  if (fix !== undefined && fix.fix == 1){
+  if (fix !== undefined && fix.fix == 1) {
     if (wp.route) {
       while (true) {
         dist = distance(fix, wp.route[routeidx]);
         // step to next point if we're within ROUTE_STEP metres
-        if (!isNaN(dist) && dist < parseInt(cfg.routeStep) && routeidx < wp.route.length-1)
+        if (!isNaN(dist) && dist < parseInt(cfg.routeStep) && routeidx < wp.route.length - 1)
           routeidx++;
         else
           break;
@@ -241,7 +260,7 @@ function onGPS(fix) {
 
 function startTimers() {
   setInterval(function() {
-    if (W==240) Bangle.setLCDPower(1); // keep banglejs1 display on
+    if (W == 240) Bangle.setLCDPower(1); // keep banglejs1 display on
     read_heading();
   }, 250);
 }
@@ -256,27 +275,31 @@ function addWaypointToMenu(menu, i) {
 //----
 
 function wptMenu() {
-      candraw = false;
-      var menu = {
-        "": { "title": "-- Waypoints --" },
-      };
-      for (let i = 0; i < waypoints.length; i++) {
-        addWaypointToMenu(menu, i);
-      }
-      menu["+ Here"] = function() {
-        addCurrentWaypoint();
-        mainScreen();
-      };
-      menu["< Back"] = mainScreen;
-      E.showMenu(menu);
-      routeidx = 0;
+  candraw = false;
+  var menu = {
+    "": {
+      "title": "-- Waypoints --"
+    },
+  };
+  for (let i = 0; i < waypoints.length; i++) {
+    addWaypointToMenu(menu, i);
+  }
+  menu["+ Here"] = function() {
+    addCurrentWaypoint();
+    mainScreen();
+  };
+  menu["< Back"] = mainScreen;
+  E.showMenu(menu);
+  routeidx = 0;
 }
 
 function optMenu() {
   candraw = false;
-  
+
   var menu = {
-    "": { "title": "-- Options --" },
+    "": {
+      "title": "-- Options --"
+    },
   };
 
   menu["< Back"] = mainScreen;
@@ -284,11 +307,16 @@ function optMenu() {
   menu["Delete " + wp.name] = function() {
     wptDel();
   };
-  
+
   menu["Step(m)"] = {
-    value : parseInt(cfg.routeStep),
-    min:50,max:300,step:50,
-    onchange : v => { cfg.routeStep=v; savSettings(); }
+    value: parseInt(cfg.routeStep),
+    min: 50,
+    max: 300,
+    step: 50,
+    onchange: v => {
+      cfg.routeStep = v;
+      savSettings();
+    }
   };
 
   E.showMenu(menu);
@@ -296,53 +324,50 @@ function optMenu() {
 
 
 function wptDel() {
-    candraw = false;
-    var thing = wp.route ? "route" : "waypoint";
-    E.showPrompt("Delete " + thing + ": " + wp.name + "?").then(function(confirmed) {
-      var name = wp.name;
-      if (confirmed) {
-        var thing = wp.route ? "Route" : "Waypoint";
-        deleteWaypoint(wp);
-        E.showAlert(thing + " deleted: " + name).then(mainScreen);
-      } else {
-       // mainScreen();
-        optMenu();
-      }
-    });  
+  candraw = false;
+  var thing = wp.route ? "route" : "waypoint";
+  E.showPrompt("Delete " + thing + ": " + wp.name + "?").then(function(confirmed) {
+    var name = wp.name;
+    if (confirmed) {
+      var thing = wp.route ? "Route" : "Waypoint";
+      deleteWaypoint(wp);
+      E.showAlert(thing + " deleted: " + name).then(mainScreen);
+    } else {
+      // mainScreen();
+      optMenu();
+    }
+  });
 
 }
 
 function wptSkip(dur) {
-  var list=[];
+  var list = [];
   var i;
   var n;
-  
+
   if (wp.route) {
-    if ( dur > 2 ) {    // Long button press to reverse route.
-      list=wp.route;
+    if (dur > 2) { // Long button press to reverse route.
+      list = wp.route;
       wp.route = [];
       for (i = 0; i < list.length; i++) {
-        wp.route[i] = list[list.length-i-1];
-      }      
-      
-      routeidx = 0;    // start of route
+        wp.route[i] = list[list.length - i - 1];
+      }
+
+      routeidx = 0; // start of route
       mainScreen();
       return;
-    }
-    else {              // Next wp in route.
+    } else { // Next wp in route.
       routeidx++;
-      if ( routeidx >= wp.route.length ) routeidx = 0;
+      if (routeidx >= wp.route.length) routeidx = 0;
     }
-  }
-  else {
-    if ( dur > 2 ) {
+  } else {
+    if (dur > 2) {
       // ignore
-    }
-    else {
+    } else {
       // build list of just waypoints, not routes
-      list = [];    // build list of just waypoints, not routes
+      list = []; // build list of just waypoints, not routes
       for (i = 0; i < waypoints.length; i++) {
-        if ( ! waypoints[i].route ) list.push(waypoints[i]);
+        if (!waypoints[i].route) list.push(waypoints[i]);
       }
       // find next in that list
       for (i = 0; i < list.length; i++) {
@@ -352,63 +377,71 @@ function wptSkip(dur) {
           break;
         }
       }
-      if ( n >= list.length ) n=0;
-      if ( list.length > 0 ) wp = list[n];
+      if (n >= list.length) n = 0;
+      if (list.length > 0) wp = list[n];
       mainScreen();
     }
   }
 }
 
-function setButtons(on){
-  if ( on ) {
+function setButtons(on) {
+  if (on) {
     // BTN1 - short = next WP, long = reverse route
     setWatch(function(e) {
       var dur = e.time - e.lastTime;
       wptSkip(dur);
-    }, BTN1, { edge:"falling",repeat:true});
-  
+    }, BTN1, {
+      edge: "falling",
+      repeat: true
+    });
+
     // BTN2 - waypoint menu
-    setWatch(function(e){
+    setWatch(function(e) {
       setButtons(false);
       wptMenu();
-    }, BTN2, {repeat:false,edge:"rising"});
-  
+    }, BTN2, {
+      repeat: false,
+      edge: "rising"
+    });
+
     // BTN3 - delete wp
-    setWatch(function(e){
+    setWatch(function(e) {
       setButtons(false);
       optMenu();
-    }, BTN3, {repeat:false,edge:"rising"});
-    }
-    else {
-      clearWatch();
-   }
+    }, BTN3, {
+      repeat: false,
+      edge: "rising"
+    });
+  } else {
+    clearWatch();
+  }
 }
 
 
 function mainScreen() {
-  E.showMenu();          // menus off
-  setButtons(false);    // restore button functions
+  E.showMenu(); // menus off
+  setButtons(false); // restore button functions
   setButtons(true);
 
   candraw = true;
-  g.setColor(0,0,0);
-  g.fillRect(0,0,W,H);
+  g.setColor(0, 0, 0);
+  g.fillRect(0, 0, W, H);
   draw(true);
   Bangle.drawWidgets();
 }
 
 function savSettings() {
-  require("Storage").write('wpmoto.json',cfg);
+  require("Storage").write('wpmoto.json', cfg);
 }
 
 // Read settings. 
-let cfg = require('Storage').readJSON('wpmoto.json',1)||{};
-cfg.routeStep = cfg.routeStep==undefined?'50':cfg.routeStep; 
+let cfg = require('Storage').readJSON('wpmoto.json', 1) || {};
+cfg.routeStep = cfg.routeStep == undefined ? '50' : cfg.routeStep;
 
 //----
 
 
-Bangle.on('kill',()=>{
+Bangle.on('kill', () => {
   Bangle.setCompassPower(0);
   Bangle.setGPSPower(0);
 });
