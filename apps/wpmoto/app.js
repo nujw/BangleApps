@@ -434,10 +434,6 @@ function savSettings() {
   require("Storage").write('wpmoto.json', cfg);
 }
 
-// Read settings. 
-let cfg = require('Storage').readJSON('wpmoto.json', 1) || {};
-cfg.routeStep = cfg.routeStep == undefined ? '50' : cfg.routeStep;
-
 //----
 
 
