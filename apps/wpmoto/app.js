@@ -287,12 +287,12 @@ function optMenu() {
     wptDel();
   };
   
-  menu["Route Step"] = {
-    value : cfg.routeStep,
+  menu["Step(m)"] = {
+    value : parseInt(cfg.routeStep),
     min:50,max:300,step:50,
-    onchange : v => { cfg.routStep=v; savSettings(); }
+    onchange : v => { cfg.routeStep=v; savSettings(); }
   };
-  
+
   E.showMenu(menu);
 }
 
@@ -363,7 +363,6 @@ function wptSkip(dur) {
   }
 }
 
-
 function setButtons(on){
   if ( on ) {
     // BTN1 - short = next WP, long = reverse route
@@ -384,7 +383,7 @@ function setButtons(on){
     }
     else {
       clearWatch();
-  }
+   }
 }
 
 
@@ -409,6 +408,7 @@ let cfg = require('Storage').readJSON('wpmoto.json',1)||{};
 cfg.routeStep = cfg.routeStep==undefined?'50':cfg.routeStep; 
 
 //----
+
 
 Bangle.on('kill',()=>{
   Bangle.setCompassPower(0);
