@@ -75,7 +75,6 @@ var arrow_img = require("heatshrink").decompress(atob("vF4wJC/AEMYBxs8Bxt+Bxv/Bp
 function flip(y,h,palette) {
   g.drawImage({width:240,height:h,bpp:1,buffer:buf.buffer, palette:palette},0,y);
   buf.clear();
-  Bangle.drawWidgets();
 }
 
 function draw(force) {
@@ -373,6 +372,7 @@ function mainScreen() {
   g.setColor(0,0,0);
   g.fillRect(0,0,W,H);
   draw(true);
+  Bangle.drawWidgets();
 }
 
 //----
