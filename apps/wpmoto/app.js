@@ -383,6 +383,8 @@ Bangle.on('kill',()=>{
 });
 
 g.clear();
+Bangle.loadWidgets();
+Bangle.drawWidgets();
 Bangle.setGPSPower(1);
 startTimers();
 Bangle.on('GPS', onGPS);
