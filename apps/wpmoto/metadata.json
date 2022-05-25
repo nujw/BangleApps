@@ -14,5 +14,8 @@
     {"name":"wpmoto.app.js","url":"app.js"},
     {"name":"wpmoto.img","url":"icon.js","evaluate":true}
   ],
-  "data": [{"name":"waypoints.json","url":"waypoints.json"}]
+  "data": [
+    {"name":"wpmoto.json"},
+    {"name":"waypoints.json","url":"waypoints.json"}
+  ]
 }
