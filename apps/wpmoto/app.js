@@ -292,14 +292,15 @@ function wptDel() {
 }
 
 function wptSkip(dur) {
-  var r2=wp.route;
+  var list=[];
   var i;
   
   if (wp.route) {
     if ( dur > 2 ) {    // Long button press to reverse route.
       wp.route = [];
-      for (i = 0; i < r2.length; i++) {
-        wp.route[i] = r2[r2.length-i-1];
+      list=wp.route;
+      for (i = 0; i < list.length; i++) {
+        wp.route[i] = list[list.length-i-1];
       }      
       
       routeidx = 0;    // start of route
@@ -316,14 +317,20 @@ function wptSkip(dur) {
       // ignore
     }
     else {
+      // build list of just waypoints, not routes
+      list = [];    // build list of just waypoints, not routes
       for (i = 0; i < waypoints.length; i++) {
-        if (waypoints[i] == wp) {
+        if ( ! waypoints[i].route ) list.push(waypoints[i]);
+      }
+      // find next in that list
+      for (i = 0; i < list.length; i++) {
+        if (list[i] == wp) {
           i++;
           break;
         }
       }
-      if ( i >= waypoints.length ) i=0;
-      wp = waypoints[i];
+      if ( i >= list.length ) i=0;
+      wp = list[i];
       mainScreen();
     }
   }
