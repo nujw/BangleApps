@@ -256,8 +256,7 @@ function addWaypointToMenu(menu, i) {
 //----
 
 function wptMenu() {
-  setButtons(false);
-     candraw = false;
+      candraw = false;
       var menu = {
         "": { "title": "-- Waypoints --" },
       };
@@ -274,7 +273,6 @@ function wptMenu() {
 }
 
 function optMenu() {
-  setButtons(false);
   candraw = false;
   
   var menu = {
@@ -298,8 +296,6 @@ function optMenu() {
 
 
 function wptDel() {
-//  setButtons(false);
- 
     candraw = false;
     var thing = wp.route ? "route" : "waypoint";
     E.showPrompt("Delete " + thing + ": " + wp.name + "?").then(function(confirmed) {
@@ -373,11 +369,13 @@ function setButtons(on){
   
     // BTN2 - waypoint menu
     setWatch(function(e){
+      setButtons(false);
       wptMenu();
     }, BTN2, {repeat:false,edge:"rising"});
   
     // BTN3 - delete wp
     setWatch(function(e){
+      setButtons(false);
       optMenu();
     }, BTN3, {repeat:false,edge:"rising"});
     }
