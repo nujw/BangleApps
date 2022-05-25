@@ -281,6 +281,9 @@ function wptMenu() {
       "title": "-- Waypoints --"
     },
   };
+
+  menu["< Back"] = mainScreen;
+
   for (let i = 0; i < waypoints.length; i++) {
     addWaypointToMenu(menu, i);
   }
@@ -288,7 +291,6 @@ function wptMenu() {
     addCurrentWaypoint();
     mainScreen();
   };
-  menu["< Back"] = mainScreen;
   E.showMenu(menu);
   routeidx = 0;
 }
