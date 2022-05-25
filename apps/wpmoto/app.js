@@ -294,6 +294,7 @@ function wptDel() {
 function wptSkip(dur) {
   var list=[];
   var i;
+  var n;
   
   if (wp.route) {
     if ( dur > 2 ) {    // Long button press to reverse route.
@@ -325,12 +326,13 @@ function wptSkip(dur) {
       // find next in that list
       for (i = 0; i < list.length; i++) {
         if (list[i] == wp) {
-          i++;
+          n = i;
+          n++;
           break;
         }
       }
-      if ( i >= list.length ) i=0;
-      wp = list[i];
+      if ( n >= list.length ) n=0;
+      if ( list.length > 0 ) wp = list[n];
       mainScreen();
     }
   }
@@ -373,6 +375,8 @@ function mainScreen() {
 }
 
 //----
+
+
 Bangle.on('kill',()=>{
   Bangle.setCompassPower(0);
   Bangle.setGPSPower(0);
