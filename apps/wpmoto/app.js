@@ -386,7 +386,7 @@ function wptSkip(dur) {
   }
 }
 
-function setButtons(on) {
+unction setButtons(on) {
   if (on) {
     // BTN1 - short = next WP, long = reverse route
     setWatch(function(e) {
@@ -403,6 +403,7 @@ function setButtons(on) {
       wptMenu();
     }, BTN2, {
       repeat: false,
+      debounce:50,
       edge: "rising"
     });
 
@@ -412,13 +413,13 @@ function setButtons(on) {
       optMenu();
     }, BTN3, {
       repeat: false,
+      debounce:50,
       edge: "rising"
     });
   } else {
     clearWatch();
   }
 }
-
 
 function mainScreen() {
   E.showMenu(); // menus off
