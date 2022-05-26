@@ -16,6 +16,8 @@ var candraw = true;
 //const ROUTE_STEP = 50; // metres
 const EPSILON = 1; // degrees
 
+var emulator = (process.env.BOARD=="EMSCRIPTEN" || process.env.BOARD=="EMSCRIPTEN2")?1:0;  // 1 = running in emulator
+
 var direction = 0;
 var dist = 0;
 
@@ -144,6 +146,7 @@ function draw(force) {
 var heading = 0;
 
 function read_heading() {
+  if ( emulator ) { heading = 185; return; }
   if (savedfix !== undefined && savedfix.satellites > 0 && !isNaN(savedfix.course)) {
     Bangle.setCompassPower(0);
     heading = savedfix.course;
@@ -231,6 +234,17 @@ function deleteWaypoint(w) {
 /*** Setup ***/
 
 function onGPS(fix) {
+  if ( emulator ) {
+    fix.fix = 1;
+    fix.speed = 10 + (Math.random()*5);
+    fix.alt = 354 + (Math.random()*50);
+    fix.lat = -38.92;
+    fix.lon = 175.7613350;   
+    fix.course = 245;
+    fix.satellites = 12;
+    fix.time = new Date();
+    fix.smoothed = 0;
+  }
   savedfix = fix;
 
   if (fix !== undefined && fix.fix == 1) {
@@ -402,9 +416,8 @@ function setButtons(on) {
       setButtons(false);
       wptMenu();
     }, BTN2, {
-//      repeat: false,
-//      debounce:50,
-//      edge: "rising"
+      repeat: false,
+      edge: emulator?"rising":"falling"
     });
 
     // BTN3 - delete wp
@@ -412,9 +425,8 @@ function setButtons(on) {
       setButtons(false);
       optMenu();
     }, BTN3, {
-//      repeat: false,
-//      debounce:50,
-//      edge: "rising"
+      repeat: false,
+      edge: emulator?"rising":"falling"
     });
   } else {
     clearWatch();
