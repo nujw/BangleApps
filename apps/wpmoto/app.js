@@ -402,9 +402,9 @@ function setButtons(on) {
       setButtons(false);
       wptMenu();
     }, BTN2, {
-      repeat: false,
-      debounce:50,
-      edge: "rising"
+//      repeat: false,
+//      debounce:50,
+//      edge: "rising"
     });
 
     // BTN3 - delete wp
@@ -412,9 +412,9 @@ function setButtons(on) {
       setButtons(false);
       optMenu();
     }, BTN3, {
-      repeat: false,
-      debounce:50,
-      edge: "rising"
+//      repeat: false,
+//      debounce:50,
+//      edge: "rising"
     });
   } else {
     clearWatch();
