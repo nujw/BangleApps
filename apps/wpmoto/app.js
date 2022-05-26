@@ -386,7 +386,7 @@ function wptSkip(dur) {
   }
 }
 
-unction setButtons(on) {
+function setButtons(on) {
   if (on) {
     // BTN1 - short = next WP, long = reverse route
     setWatch(function(e) {
