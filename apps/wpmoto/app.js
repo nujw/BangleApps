@@ -370,13 +370,13 @@ function wptSkip(dur) {
       }
 
       routeidx = 0; // start of route
-      mainScreen();
-      return;
     } else { // Next wp in route.
       routeidx++;
       if (routeidx >= wp.route.length) routeidx = 0;
     }
-  } else {
+    mainScreen();
+  }
+  /* else {
     if (dur > 2) {
       // ignore
     } else {
@@ -398,6 +398,7 @@ function wptSkip(dur) {
       mainScreen();
     }
   }
+  */
 }
 
 function setButtons(on) {
