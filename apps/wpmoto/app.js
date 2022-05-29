@@ -373,20 +373,20 @@ function rteRev() {
   for (i = 0; i < list.length; i++) {
     wp.route[i] = list[list.length - i - 1];
   }
-  cfg.routeIdx = 0; // start of route
 }
 
 function wptSkip(dur) {
   if (wp.route) {
     if (dur > 2) { // Long button press to reverse route.
       rteRev();
+      cfg.routeIdx = 0; // start of route
       cfg.routeReverse = !cfg.routeReverse;
     } else { // Next wp in route.
       cfg.routeIdx++;
       if (cfg.routeIdx >= wp.route.length) cfg.routeIdx = 0;
     }
-    mainScreen();
     savSettings();
+    mainScreen();
   }
   /* else {
     if (dur > 2) {
