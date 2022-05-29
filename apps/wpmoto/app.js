@@ -2,15 +2,23 @@ var loc = require("locale");
 
 // Read settings. 
 let cfg = require('Storage').readJSON('wpmoto.json', 1) || {};
-cfg.routeStep = cfg.routeStep == undefined ? '50' : cfg.routeStep;
+cfg.routeStep = parseInt(cfg.routeStep == undefined ? '50' : cfg.routeStep);
+cfg.routeIdx = parseInt(cfg.routeIdx == undefined ? '0' : cfg.routeIdx);
+cfg.wptIdx = parseInt(cfg.wptIdx == undefined ? '0' : cfg.wptIdx);
+cfg.routeReverse = cfg.routeReverse == undefined ? false : cfg.routeReverse;
 
 var waypoints = require("Storage").readJSON("waypoints.json") || [];
-var wp = waypoints[0];
-if (wp == undefined) wp = {
-  name: "NONE"
-};
+var wp = waypoints[cfg.wptIdx];
+if (wp == undefined) {
+  wp = {name: "NONE"};
+}
+// Restore last progress
+if (wp.route) {
+  if ( cfg.routeReverse ) rteRev();
+}
+
+
 var wp_bearing = 0;
-var routeidx = 0;
 var candraw = true;
 
 //const ROUTE_STEP = 50; // metres
@@ -99,7 +107,7 @@ function draw(force) {
   var course = direction;
   var dst = loc.distance(dist);
 
-  if (force || previous.dst !== dst || previous.wp_name !== wp.name || previous.routeidx !== routeidx || Math.abs(course - previous.course) > EPSILON) {
+  if (force || previous.dst !== dst || previous.wp_name !== wp.name || previous.routeidx !== cfg.routeIdx || Math.abs(course - previous.course) > EPSILON) {
     previous.course = course;
 
     var palette = pal_br;
@@ -119,7 +127,7 @@ function draw(force) {
     // distance on left
     previous.dst = dst;
     previous.wp_name = wp.name;
-    previous.routeidx = routeidx;
+    previous.routeidx = cfg.routeIdx;
 
     buf.setColor(1);
     buf.setFontAlign(-1, -1);
@@ -134,7 +142,7 @@ function draw(force) {
 
     // if this is a route, draw the step name above the route name
     if (wp.route) {
-      buf.drawString((wp.route[routeidx].name || '') + " " + (routeidx + 1) + "/" + wp.route.length, W, 0);
+      buf.drawString((wp.route[cfg.routeIdx].name || '') + " " + (cfg.routeIdx + 1) + "/" + wp.route.length, W, 0);
     }
 
     flip(L.text.bufy, L.text.bufh, pal_bw);
@@ -250,10 +258,12 @@ function onGPS(fix) {
   if (fix !== undefined && fix.fix == 1) {
     if (wp.route) {
       while (true) {
-        dist = distance(fix, wp.route[routeidx]);
+        dist = distance(fix, wp.route[cfg.routeIdx]);
         // step to next point if we're within ROUTE_STEP metres
-        if (!isNaN(dist) && dist < parseInt(cfg.routeStep) && routeidx < wp.route.length - 1)
-          routeidx++;
+        if (!isNaN(dist) && dist < parseInt(cfg.routeStep) && cfg.routeIdx < wp.route.length - 1) {
+          cfg.routeIdx++;
+          savSettings();
+        }
         else
           break;
       }
@@ -263,7 +273,7 @@ function onGPS(fix) {
     if (isNaN(dist)) dist = 0;
 
     if (wp.route) {
-      wp_bearing = bearing(fix, wp.route[routeidx]);
+      wp_bearing = bearing(fix, wp.route[cfg.routeIdx]);
     } else {
       wp_bearing = bearing(fix, wp);
     }
@@ -282,6 +292,9 @@ function startTimers() {
 function addWaypointToMenu(menu, i) {
   menu[waypoints[i].name + (waypoints[i].route ? " (R)" : "")] = function() {
     wp = waypoints[i];
+    cfg.wptIdx = i; 
+    cfg.routeReverse = false;
+    savSettings();
     mainScreen();
   };
 }
@@ -306,7 +319,8 @@ function wptMenu() {
     mainScreen();
   };
   E.showMenu(menu);
-  routeidx = 0;
+  cfg.routeIdx = 0;
+  savSettings();
 }
 
 function optMenu() {
@@ -356,25 +370,28 @@ function wptDel() {
 
 }
 
-function wptSkip(dur) {
+function rteRev() {
   var list = [];
   var i;
-  var n;
+  list = wp.route;
+  wp.route = [];
+  for (i = 0; i < list.length; i++) {
+    wp.route[i] = list[list.length - i - 1];
+  }
+  cfg.routeIdx = 0; // start of route
+}
 
+function wptSkip(dur) {
   if (wp.route) {
     if (dur > 2) { // Long button press to reverse route.
-      list = wp.route;
-      wp.route = [];
-      for (i = 0; i < list.length; i++) {
-        wp.route[i] = list[list.length - i - 1];
-      }
-
-      routeidx = 0; // start of route
+      rteRev();
+      cfg.routeReverse = !cfg.routeReverse;
     } else { // Next wp in route.
-      routeidx++;
-      if (routeidx >= wp.route.length) routeidx = 0;
+      cfg.routeIdx++;
+      if (cfg.routeIdx >= wp.route.length) cfg.routeIdx = 0;
     }
     mainScreen();
+    savSettings();
   }
   /* else {
     if (dur > 2) {
