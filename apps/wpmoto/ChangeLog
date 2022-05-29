@@ -1,2 +1,2 @@
-1.15 : BTN1 Skips forward to next waypoint on a route. BTN1 ( > 2 secs ) : Reverses the current route and sets it to the first waypoint.BTN2 : Unchanged. BTN3 : Options menu including the delete waypoint/route. Can set a desired route step value.
-1.16 : Record route progress and restore when app is restarted. Resets progress when route is reversed.
+1.15: BTN1 Skips forward to next waypoint on a route. BTN1 ( > 2 secs ) : Reverses the current route and sets it to the first waypoint.BTN2 : Unchanged. BTN3 : Options menu including the delete waypoint/route. Can set a desired route step value.
+1.16: Record route progress and restore when app is restarted. Resets progress when route is reversed.
