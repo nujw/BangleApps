@@ -12,11 +12,6 @@ var wp = waypoints[cfg.wptIdx];
 if (wp == undefined) {
   wp = {name: "NONE"};
 }
-// Restore last progress
-if (wp.route) {
-  if ( cfg.routeReverse ) rteRev();
-}
-
 
 var wp_bearing = 0;
 var candraw = true;
@@ -469,6 +464,10 @@ function savSettings() {
 
 //----
 
+// Restore last progress
+if (wp.route) {
+  if ( cfg.routeReverse ) rteRev();
+}
 
 Bangle.on('kill', () => {
   Bangle.setCompassPower(0);
