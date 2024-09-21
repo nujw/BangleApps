@@ -2,7 +2,7 @@
   "id": "wpmoto",
   "name": "Waypointer Moto",
   "shortName": "Waypointer Moto",
-  "version": "1.17",
+  "version": "1.18",
   "description": "Waypoint-based motorcycle navigation aid",
   "icon": "wpmoto.png",
   "tags": "tool,outdoors,gps",
@@ -16,6 +16,15 @@
   ],
   "data": [
     {"name":"wpmoto.json"},
-    {"name":"waypoints.json","url":"waypoints.json"}
+    {"name":"waypoints.json","url":"waypoints.json"},
+    {"name":"route1.json","url":"route1.json"},
+    {"name":"route2.json","url":"route2.json"},
+    {"name":"route3.json","url":"route3.json"},
+    {"name":"route4.json","url":"route4.json"},
+    {"name":"route5.json","url":"route5.json"},
+    {"name":"route6.json","url":"route6.json"},
+    {"name":"route7.json","url":"route7.json"},
+    {"name":"route8.json","url":"route8.json"},
+    {"name":"route9.json","url":"route9.json"}
   ]
 }
