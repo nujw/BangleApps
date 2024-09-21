@@ -330,7 +330,23 @@ function optMenu() {
 
   menu["< Back"] = mainScreen;
 
-  menu["Delete " + wp.name] = function() {
+    menu["Route File"] = {
+    value: parseInt(cfg.routeNum),
+    min: 1,
+    max: 9,
+    step: 1,
+    onchange: v => {
+      cfg.routeNum = v;
+      savSettings();
+      waypoints = require("Storage").readJSON('route'+cfg.routeNum+'.json') || [];
+      wp = waypoints[0];
+      cfg.wptIdx = 0; 
+      cfg.routeReverse = false;
+      savSettings();
+    }
+  };
+
+  menu["Del WP " + wp.name] = function() {
     wptDel();
   };
 
@@ -342,18 +358,6 @@ function optMenu() {
     onchange: v => {
       cfg.routeStep = v;
       savSettings();
-    }
-  };
-
-    menu["Route File"] = {
-    value: parseInt(cfg.routeNum),
-    min: 1,
-    max: 9,
-    step: 1,
-    onchange: v => {
-      cfg.routeNum = v;
-      savSettings();
-      waypoints = require("Storage").readJSON('route'+cfg.routeNum+'.json') || [];
     }
   };
 
