@@ -346,7 +346,7 @@ function optMenu() {
   };
 
     menu["Rt File"] = {
-    value: parseInt(cfg.routeStep),
+    value: parseInt(cfg.routeNum),
     min: 1,
     max: 9,
     step: 1,
