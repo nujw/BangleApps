@@ -3,11 +3,12 @@ var loc = require("locale");
 // Read settings. 
 let cfg = require('Storage').readJSON('wpmoto.json', 1) || {};
 cfg.routeStep = parseInt(cfg.routeStep == undefined ? '50' : cfg.routeStep);
-cfg.routeIdx = parseInt(cfg.routeIdx == undefined ? '0' : cfg.routeIdx);
+cfg.routeIdx = parseInt(cfg.routeIdx == undefined ? '0' : cfg.routeIdx); // Selected route within route file
+cfg.routeNum = parseInt(cfg.routeNum == undefined ? '1' : cfg.routeNum); // Selected route file
 cfg.wptIdx = parseInt(cfg.wptIdx == undefined ? '0' : cfg.wptIdx);
 cfg.routeReverse = cfg.routeReverse == undefined ? false : cfg.routeReverse;
 
-var waypoints = require("Storage").readJSON("waypoints.json") || [];
+var waypoints = require("Storage").readJSON('route'+cfg.routeNum+'.json') || [];
 var wp = waypoints[cfg.wptIdx];
 if (wp == undefined) {
   wp = {name: "NONE"};
@@ -219,7 +220,7 @@ function addCurrentWaypoint() {
 }
 
 function saveWaypoints() {
-  require("Storage").writeJSON("waypoints.json", waypoints);
+  require("Storage").writeJSON('route'+cfg.routeNum+'.json', waypoints);
 }
 
 function deleteWaypoint(w) {
@@ -341,6 +342,18 @@ function optMenu() {
     onchange: v => {
       cfg.routeStep = v;
       savSettings();
+    }
+  };
+
+    menu["Rt File"] = {
+    value: parseInt(cfg.routeStep),
+    min: 1,
+    max: 9,
+    step: 1,
+    onchange: v => {
+      cfg.routeNum = v;
+      savSettings();
+      waypoints = require("Storage").readJSON('route'+cfg.routeNum+'.json') || [];
     }
   };
 
