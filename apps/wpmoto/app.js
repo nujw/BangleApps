@@ -345,7 +345,7 @@ function optMenu() {
     }
   };
 
-    menu["Rt File"] = {
+    menu["Route File"] = {
     value: parseInt(cfg.routeNum),
     min: 1,
     max: 9,
